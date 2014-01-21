@@ -1,22 +1,22 @@
 /* OggSharp
  * Copyright (C) 2000 ymnk, JCraft,Inc.
- *  
+ *
  * Written by: 2000 ymnk<ymnk@jcraft.com>
- * Ported to C# from JOrbis by: Mark Crichton <crichton@gimp.org> 
- *   
+ * Ported to C# from JOrbis by: Mark Crichton <crichton@gimp.org>
+ *
  * Thanks go to the JOrbis team, for licencing the code under the
  * LGPL, making my job a lot easier.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
-   
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -33,22 +33,22 @@ namespace OggSharp
 	{
 		private static int BUFFER_INCREMENT = 256;
 
-		private static uint[] mask={
-									  0x00000000,0x00000001,0x00000003,0x00000007,0x0000000f,
-									  0x0000001f,0x0000003f,0x0000007f,0x000000ff,0x000001ff,
-									  0x000003ff,0x000007ff,0x00000fff,0x00001fff,0x00003fff,
-									  0x00007fff,0x0000ffff,0x0001ffff,0x0003ffff,0x0007ffff,
-									  0x000fffff,0x001fffff,0x003fffff,0x007fffff,0x00ffffff,
-									  0x01ffffff,0x03ffffff,0x07ffffff,0x0fffffff,0x1fffffff,
-									  0x3fffffff,0x7fffffff,0xffffffff
-								  };
+		private static uint[] mask= {
+			0x00000000,0x00000001,0x00000003,0x00000007,0x0000000f,
+			0x0000001f,0x0000003f,0x0000007f,0x000000ff,0x000001ff,
+			0x000003ff,0x000007ff,0x00000fff,0x00001fff,0x00003fff,
+			0x00007fff,0x0000ffff,0x0001ffff,0x0003ffff,0x0007ffff,
+			0x000fffff,0x001fffff,0x003fffff,0x007fffff,0x00ffffff,
+			0x01ffffff,0x03ffffff,0x07ffffff,0x0fffffff,0x1fffffff,
+			0x3fffffff,0x7fffffff,0xffffffff
+		};
 		int ptr = 0;
 		byte[] buffer = null;
 		int endbit = 0;
 		int endbyte = 0;
 		int storage = 0;
 
-		public void writeinit() 
+		public void writeinit()
 		{
 			buffer = new byte[BUFFER_INCREMENT];
 			ptr = 0;
@@ -56,11 +56,10 @@ namespace OggSharp
 			storage = BUFFER_INCREMENT;
 		}
 
-		public void write(byte[] s) 
+		public void write(byte[] s)
 		{
-			for(int i = 0; i < s.Length; i++) 
-			{
-				if(s[i] == 0) break;
+			for(int i = 0; i < s.Length; i++) {
+				if(s[i] == 0) { break; }
 				write(s[i], 8);
 			}
 		}
@@ -68,13 +67,12 @@ namespace OggSharp
 		public void read (byte[] s, int bytes)
 		{
 			int i = 0;
-			while(bytes--!=0) 
-			{
+			while(bytes--!=0) {
 				s[i++]=(byte)(read(8));
 			}
 		}
 
-		void reset() 
+		void reset()
 		{
 			ptr = 0;
 			buffer[0] = (byte)'\0';
@@ -96,8 +94,7 @@ namespace OggSharp
 
 		public void write(int vvalue, int bits)
 		{
-			if(endbyte + 4 >= storage) 
-			{
+			if(endbyte + 4 >= storage) {
 				byte[] foo = new byte[storage + BUFFER_INCREMENT];
 				Array.Copy(buffer, 0, foo, 0, storage);
 				buffer = foo;
@@ -108,21 +105,19 @@ namespace OggSharp
 			bits += endbit;
 			buffer[ptr] |= (byte)(vvalue << endbit);
 
-			if(bits >= 8)
-			{
+			if(bits >= 8) {
 				buffer[ptr+1] = (byte)((uint)vvalue >> (8-endbit));
-				if(bits >= 16)
-				{
+				if(bits >= 16) {
 					buffer[ptr+2] = (byte)((uint)vvalue >> (16-endbit));
-					if (bits >= 24)
-					{
+					if (bits >= 24) {
 						buffer[ptr+3] = (byte)((uint)vvalue >> (24-endbit));
-						if(bits >= 32)
-						{
-							if(endbit > 0)
+						if(bits >= 32) {
+							if(endbit > 0) {
 								buffer[ptr+4] = (byte)((uint)vvalue >> (32-endbit));
-							else
+							}
+							else {
 								buffer[ptr+4]=0;
+							}
 						}
 					}
 				}
@@ -140,25 +135,21 @@ namespace OggSharp
 
 			bits += endbit;
 
-			if(endbyte + 4 >= storage)
-			{
-				if(endbyte+(bits-1)/8 >= storage)
+			if(endbyte + 4 >= storage) {
+				if(endbyte+(bits-1)/8 >= storage) {
 					return (-1);
+				}
 			}
 
 			ret = ((buffer[ptr]) & 0xff) >> endbit;
 
-			if(bits > 8)
-			{
+			if(bits > 8) {
 				ret |= ((buffer[ptr+1]) & 0xff) << (8 - endbit);
-				if(bits > 16)
-				{
+				if(bits > 16) {
 					ret |= ((buffer[ptr+2])&0xff) << (16-endbit);
-					if(bits > 24)
-					{
+					if(bits > 24) {
 						ret |= ((buffer[ptr+3])&0xff) << (24-endbit);
-						if((bits > 32) && (endbit != 0))
-						{
+						if((bits > 32) && (endbit != 0)) {
 							ret |= ((buffer[ptr+4])&0xff) << (32-endbit);
 						}
 					}
@@ -170,8 +161,9 @@ namespace OggSharp
 
 		public int look1()
 		{
-			if(endbyte >= storage)
+			if(endbyte >= storage) {
 				return(-1);
+			}
 			return((buffer[ptr] >> endbit) & 1);
 		}
 
@@ -186,8 +178,7 @@ namespace OggSharp
 		public void adv1()
 		{
 			++endbit;
-			if(endbit > 7)
-			{
+			if(endbit > 7) {
 				endbit = 0;
 				ptr++;
 				endbyte++;
@@ -201,11 +192,9 @@ namespace OggSharp
 
 			bits += endbit;
 
-			if(endbyte+4 >= storage)
-			{
+			if(endbyte+4 >= storage) {
 				ret = -1;
-				if(endbyte + (bits-1)/8 >= storage)
-				{
+				if(endbyte + (bits-1)/8 >= storage) {
 					ptr += bits/8;
 					endbyte += bits/8;
 					endbit = bits&7;
@@ -214,18 +203,14 @@ namespace OggSharp
 			}
 
 			ret = ((buffer[ptr]) & 0xff) >> endbit;
-			if(bits > 8)
-			{
+			if(bits > 8) {
 				ret|=((buffer[ptr+1])&0xff)<<(8-endbit);
-				if(bits > 16)
-				{
+				if(bits > 16) {
 					ret|=((buffer[ptr+2])&0xff)<<(16-endbit);
-					if(bits > 24)
-					{
+					if(bits > 24) {
 						ret|=((buffer[ptr+3])&0xff)<<(24-endbit);
 
-						if((bits > 32) && (endbit != 0))
-						{
+						if((bits > 32) && (endbit != 0)) {
 							ret|=((buffer[ptr+4])&0xff)<<(32-endbit);
 						}
 					}
@@ -243,12 +228,10 @@ namespace OggSharp
 		public int read1()
 		{
 			int ret;
-			if(endbyte>=storage)
-			{
+			if(endbyte>=storage) {
 				ret = -1;
 				endbit++;
-				if(endbit > 7)
-				{
+				if(endbit > 7) {
 					endbit = 0;
 					ptr++;
 					endbyte++;
@@ -259,8 +242,7 @@ namespace OggSharp
 			ret=(buffer[ptr] >> endbit) & 1;
 
 			endbit++;
-			if(endbit > 7)
-			{
+			if(endbit > 7) {
 				endbit = 0;
 				ptr++;
 				endbyte++;
@@ -281,8 +263,7 @@ namespace OggSharp
 		public static int ilog(int v)
 		{
 			int ret=0;
-			while(v > 0)
-			{
+			while(v > 0) {
 				ret++;
 				v >>= 1;
 			}

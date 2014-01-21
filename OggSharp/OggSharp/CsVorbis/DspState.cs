@@ -1,22 +1,22 @@
 /* OggSharp
  * Copyright (C) 2000 ymnk, JCraft,Inc.
- *  
+ *
  * Written by: 2000 ymnk<ymnk@jcraft.com>
- * Ported to C# from JOrbis by: Mark Crichton <crichton@gimp.org> 
- *   
+ * Ported to C# from JOrbis by: Mark Crichton <crichton@gimp.org>
+ *
  * Thanks go to the JOrbis team, for licencing the code under the
  * LGPL, making my job a lot easier.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
-   
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -26,7 +26,7 @@
 using System;
 
 
-namespace OggSharp 
+namespace OggSharp
 {
 	public class DspState
 	{
@@ -67,7 +67,7 @@ namespace OggSharp
 		//!!  Envelope ve=new Envelope(); // envelope
 		//float                **window[2][2][2]; // block, leadin, leadout, type
 		internal float[][][][][] wnd;                 // block, leadin, leadout, type
-		//vorbis_look_transform **transform[2];    // block, type 
+		//vorbis_look_transform **transform[2];    // block, type
 		internal Object[][] transform;
 		internal CodeBook[] fullbooks;
 		// backend lookups are tied to the mode, not the backend or naked mapping
@@ -104,8 +104,7 @@ namespace OggSharp
 		private static int ilog2(int v)
 		{
 			int ret=0;
-			while(v>1)
-			{
+			while(v>1) {
 				ret++;
 				v = (int)((uint)v >> 1);
 			}
@@ -115,43 +114,39 @@ namespace OggSharp
 		internal static float[] window(int type, int wnd, int left, int right)
 		{
 			float[] ret=new float[wnd];
-			switch(type)
+			switch(type) {
+			case 0:
+				// The 'vorbis window' (window 0) is sin(sin(x)*sin(x)*2pi)
 			{
-				case 0:
-					// The 'vorbis window' (window 0) is sin(sin(x)*sin(x)*2pi)
-				{
-					int leftbegin=wnd/4-left/2;
-					int rightbegin=wnd-wnd/4-right/2;
-    
-					for(int i=0;i<left;i++)
-					{
-						float x=(float)((i+.5)/left*M_PI/2.0);
-						x=(float)Math.Sin(x);
-						x*=x;
-						x*=(float)(M_PI/2.0);
-						x=(float)Math.Sin(x);
-						ret[i+leftbegin]=x;
-					}
-      
-					for(int i=leftbegin+left;i<rightbegin;i++)
-					{
-						ret[i]=1.0f;
-					}
-      
-					for(int i=0;i<right;i++)
-					{
-						float x=(float)((right-i-.5)/right*M_PI/2.0);
-						x=(float)Math.Sin(x);
-						x*=x;
-						x*=(float)(M_PI/2.0);
-						x=(float)Math.Sin(x);
-						ret[i+rightbegin]=x;
-					}
+				int leftbegin=wnd/4-left/2;
+				int rightbegin=wnd-wnd/4-right/2;
+
+				for(int i=0; i<left; i++) {
+					float x=(float)((i+.5)/left*M_PI/2.0);
+					x=(float)Math.Sin(x);
+					x*=x;
+					x*=(float)(M_PI/2.0);
+					x=(float)Math.Sin(x);
+					ret[i+leftbegin]=x;
 				}
-					break;
-				default:
-					//free(ret);
-					return(null);
+
+				for(int i=leftbegin+left; i<rightbegin; i++) {
+					ret[i]=1.0f;
+				}
+
+				for(int i=0; i<right; i++) {
+					float x=(float)((right-i-.5)/right*M_PI/2.0);
+					x=(float)Math.Sin(x);
+					x*=x;
+					x*=(float)(M_PI/2.0);
+					x=(float)Math.Sin(x);
+					ret[i+rightbegin]=x;
+				}
+			}
+			break;
+			default:
+				//free(ret);
+				return(null);
 			}
 			return(ret);
 		}
@@ -185,18 +180,17 @@ namespace OggSharp
 			wnd[1][1][0]=new float[VI_WINDOWB][];
 			wnd[1][1][1]=new float[VI_WINDOWB][];
 
-			for(int i=0;i<VI_WINDOWB;i++)
-			{
+			for(int i=0; i<VI_WINDOWB; i++) {
 				wnd[0][0][0][i]=
-					window(i,vi.blocksizes[0],vi.blocksizes[0]/2,vi.blocksizes[0]/2);
+				    window(i,vi.blocksizes[0],vi.blocksizes[0]/2,vi.blocksizes[0]/2);
 				wnd[1][0][0][i]=
-					window(i,vi.blocksizes[1],vi.blocksizes[0]/2,vi.blocksizes[0]/2);
+				    window(i,vi.blocksizes[1],vi.blocksizes[0]/2,vi.blocksizes[0]/2);
 				wnd[1][0][1][i]=
-					window(i,vi.blocksizes[1],vi.blocksizes[0]/2,vi.blocksizes[1]/2);
+				    window(i,vi.blocksizes[1],vi.blocksizes[0]/2,vi.blocksizes[1]/2);
 				wnd[1][1][0][i]=
-					window(i,vi.blocksizes[1],vi.blocksizes[1]/2,vi.blocksizes[0]/2);
+				    window(i,vi.blocksizes[1],vi.blocksizes[1]/2,vi.blocksizes[0]/2);
 				wnd[1][1][1][i]=
-					window(i,vi.blocksizes[1],vi.blocksizes[1]/2,vi.blocksizes[1]/2);
+				    window(i,vi.blocksizes[1],vi.blocksizes[1]/2,vi.blocksizes[1]/2);
 			}
 
 			//    if(encp){ // encode/decode differ here
@@ -211,8 +205,7 @@ namespace OggSharp
 			//    else{
 			// finish the codebooks
 			fullbooks=new CodeBook[vi.books];
-			for(int i=0;i<vi.books;i++)
-			{
+			for(int i=0; i<vi.books; i++) {
 				fullbooks[i]=new CodeBook();
 				fullbooks[i].init_decode(vi.book_param[i]);
 			}
@@ -221,18 +214,17 @@ namespace OggSharp
 
 			// initialize the storage vectors to a decent size greater than the
 			// minimum
-  
+
 			pcm_storage=8192; // we'll assume later that we have
 			// a minimum of twice the blocksize of
 			// accumulated samples in analysis
 			pcm=new float[vi.channels][];
 			//pcmret=new float[vi.channels][];
-		{
-			for(int i=0;i<vi.channels;i++)
 			{
-				pcm[i]=new float[pcm_storage];
+				for(int i=0; i<vi.channels; i++) {
+					pcm[i]=new float[pcm_storage];
+				}
 			}
-		}
 
 			// all 1 (large block) or 0 (small block)
 			// explicitly set for the sake of clarity
@@ -247,13 +239,12 @@ namespace OggSharp
 			// initialize all the mapping/backend lookups
 			mode=new Object[vi.modes];
 
-			for(int i=0;i<vi.modes;i++)
-			{
+			for(int i=0; i<vi.modes; i++) {
 				int mapnum=vi.mode_param[i].mapping;
 				int maptype=vi.map_type[mapnum];
 
-				mode[i]=FuncMapping.mapping_P[maptype].look(this,vi.mode_param[i], 
-					vi.map_param[mapnum]);
+				mode[i]=FuncMapping.mapping_P[maptype].look(this,vi.mode_param[i],
+				        vi.map_param[mapnum]);
 
 			}
 			return(0);
@@ -288,8 +279,7 @@ namespace OggSharp
 		{
 			// Shift out any PCM/multipliers that we returned previously
 			// centerW is currently the center of the last block added
-			if(centerW>vi.blocksizes[1]/2 && pcm_returned>8192)
-			{
+			if(centerW>vi.blocksizes[1]/2 && pcm_returned>8192) {
 				// don't shift too much; we need to have a minimum PCM buffer of
 				// 1/2 long block
 
@@ -299,10 +289,8 @@ namespace OggSharp
 				pcm_current-=shiftPCM;
 				centerW-=shiftPCM;
 				pcm_returned-=shiftPCM;
-				if(shiftPCM!=0)
-				{
-					for(int i=0;i<vi.channels;i++)
-					{
+				if(shiftPCM!=0) {
+					for(int i=0; i<vi.channels; i++) {
 						Array.Copy(pcm[i], shiftPCM, pcm[i], 0, pcm_current);
 					}
 				}
@@ -317,34 +305,31 @@ namespace OggSharp
 			floor_bits+=vb.floor_bits;
 			res_bits+=vb.res_bits;
 
-			if(sequence+1 != vb.sequence)granulepos=-1; // out of sequence; lose count
+			if(sequence+1 != vb.sequence) { granulepos=-1; } // out of sequence; lose count
 
 			sequence=vb.sequence;
 
-		{
-			int sizeW=vi.blocksizes[W];
-			int _centerW=centerW+vi.blocksizes[lW]/4+sizeW/4;
-			int beginW=_centerW-sizeW/2;
-			int endW=beginW+sizeW;
-			int beginSl=0;
-			int endSl=0;
-
-			// Do we have enough PCM/mult storage for the block?
-			if(endW>pcm_storage)
 			{
-				// expand the storage
-				pcm_storage=endW+vi.blocksizes[1];
-				for(int i=0;i<vi.channels;i++)
-				{
-					float[] foo=new float[pcm_storage];
-					Array.Copy(pcm[i], 0, foo, 0, pcm[i].Length);
-					pcm[i]=foo;
+				int sizeW=vi.blocksizes[W];
+				int _centerW=centerW+vi.blocksizes[lW]/4+sizeW/4;
+				int beginW=_centerW-sizeW/2;
+				int endW=beginW+sizeW;
+				int beginSl=0;
+				int endSl=0;
+
+				// Do we have enough PCM/mult storage for the block?
+				if(endW>pcm_storage) {
+					// expand the storage
+					pcm_storage=endW+vi.blocksizes[1];
+					for(int i=0; i<vi.channels; i++) {
+						float[] foo=new float[pcm_storage];
+						Array.Copy(pcm[i], 0, foo, 0, pcm[i].Length);
+						pcm[i]=foo;
+					}
 				}
-			}
 
-			// overlap/add PCM
-			switch(W)
-			{
+				// overlap/add PCM
+				switch(W) {
 				case 0:
 					beginSl=0;
 					endSl=vi.blocksizes[0]/2;
@@ -353,72 +338,62 @@ namespace OggSharp
 					beginSl=vi.blocksizes[1]/4-vi.blocksizes[lW]/4;
 					endSl=beginSl+vi.blocksizes[lW]/2;
 					break;
-			}
-
-			for(int j=0;j<vi.channels;j++)
-			{
-				int _pcm=beginW;
-				// the overlap/add section
-				int i=0;
-				for(i=beginSl;i<endSl;i++)
-				{
-					pcm[j][_pcm+i]+=vb.pcm[j][i];
 				}
-				// the remaining section
-				for(;i<sizeW;i++)
-				{
-					pcm[j][_pcm+i]=vb.pcm[j][i];
+
+				for(int j=0; j<vi.channels; j++) {
+					int _pcm=beginW;
+					// the overlap/add section
+					int i=0;
+					for(i=beginSl; i<endSl; i++) {
+						pcm[j][_pcm+i]+=vb.pcm[j][i];
+					}
+					// the remaining section
+					for(; i<sizeW; i++) {
+						pcm[j][_pcm+i]=vb.pcm[j][i];
+					}
 				}
-			}
 
-			// track the frame number... This is for convenience, but also
-			// making sure our last packet doesn't end with added padding.  If
-			// the last packet is partial, the number of samples we'll have to
-			// return will be past the vb->granulepos.
-			//       
-			// This is not foolproof!  It will be confused if we begin
-			// decoding at the last page after a seek or hole.  In that case,
-			// we don't have a starting point to judge where the last frame
-			// is.  For this reason, vorbisfile will always try to make sure
-			// it reads the last two marked pages in proper sequence
+				// track the frame number... This is for convenience, but also
+				// making sure our last packet doesn't end with added padding.  If
+				// the last packet is partial, the number of samples we'll have to
+				// return will be past the vb->granulepos.
+				//
+				// This is not foolproof!  It will be confused if we begin
+				// decoding at the last page after a seek or hole.  In that case,
+				// we don't have a starting point to judge where the last frame
+				// is.  For this reason, vorbisfile will always try to make sure
+				// it reads the last two marked pages in proper sequence
 
-			if(granulepos==-1)
-			{
-				granulepos=vb.granulepos;
-			}
-			else
-			{
-				granulepos+=(_centerW-centerW);
-				if(vb.granulepos!=-1 && granulepos!=vb.granulepos)
-				{
-					if(granulepos>vb.granulepos && vb.eofflag!=0)
-					{
-						// partial last frame.  Strip the padding off
-						_centerW = _centerW - (int)(granulepos-vb.granulepos);
-					}// else{ Shouldn't happen *unless* the bitstream is out of
-					// spec.  Either way, believe the bitstream }
+				if(granulepos==-1) {
 					granulepos=vb.granulepos;
 				}
+				else {
+					granulepos+=(_centerW-centerW);
+					if(vb.granulepos!=-1 && granulepos!=vb.granulepos) {
+						if(granulepos>vb.granulepos && vb.eofflag!=0) {
+							// partial last frame.  Strip the padding off
+							_centerW = _centerW - (int)(granulepos-vb.granulepos);
+						}// else{ Shouldn't happen *unless* the bitstream is out of
+						// spec.  Either way, believe the bitstream }
+						granulepos=vb.granulepos;
+					}
+				}
+
+				// Update, cleanup
+
+				centerW=_centerW;
+				pcm_current=endW;
+				if(vb.eofflag!=0) { eofflag=1; }
 			}
-
-			// Update, cleanup
-
-			centerW=_centerW;
-			pcm_current=endW;
-			if(vb.eofflag!=0)eofflag=1;
-		}
 			return(0);
 		}
 
 		// pcm==NULL indicates we just want the pending samples, no more
 		public int synthesis_pcmout(float[][][] _pcm, int[] index)
 		{
-			if(pcm_returned<centerW)
-			{
-				if(_pcm!=null)
-				{
-					for(int i=0;i<vi.channels;i++)
-					{
+			if(pcm_returned<centerW) {
+				if(_pcm!=null) {
+					for(int i=0; i<vi.channels; i++) {
 						//	  pcmret[i]=pcm[i]+v.pcm_returned;
 						//!!!!!!!!
 						index[i]=pcm_returned;
@@ -432,7 +407,7 @@ namespace OggSharp
 
 		public int synthesis_read(int bytes)
 		{
-			if(bytes!=0 && pcm_returned+bytes>centerW)return(-1);
+			if(bytes!=0 && pcm_returned+bytes>centerW) { return(-1); }
 			pcm_returned+=bytes;
 			return(0);
 		}

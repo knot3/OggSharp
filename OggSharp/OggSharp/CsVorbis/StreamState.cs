@@ -1,22 +1,22 @@
 /* OggSharp
  * Copyright (C) 2000 ymnk, JCraft,Inc.
- *  
+ *
  * Written by: 2000 ymnk<ymnk@jcraft.com>
- * Ported to C# from JOrbis by: Mark Crichton <crichton@gimp.org> 
- *   
+ * Ported to C# from JOrbis by: Mark Crichton <crichton@gimp.org>
+ *
  * Thanks go to the JOrbis team, for licencing the code under the
  * LGPL, making my job a lot easier.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public License
  * as published by the Free Software Foundation; either version 2 of
  * the License, or (at your option) any later version.
-   
+
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -83,12 +83,11 @@ namespace OggSharp
 		}
 		public void init(int serialno)
 		{
-			if(body_data==null){ init(); }
-			else
-			{
-				for(int i=0; i<body_data.Length; i++) body_data[i]=0;
-				for(int i=0; i<lacing_vals.Length; i++) lacing_vals[i]=0;
-				for(int i=0; i<granule_vals.Length; i++) granule_vals[i]=0;
+			if(body_data==null) { init(); }
+			else {
+				for(int i=0; i<body_data.Length; i++) { body_data[i]=0; }
+				for(int i=0; i<lacing_vals.Length; i++) { lacing_vals[i]=0; }
+				for(int i=0; i<granule_vals.Length; i++) { granule_vals[i]=0; }
 			}
 			this.serialno=serialno;
 		}
@@ -97,7 +96,7 @@ namespace OggSharp
 			body_data=null;
 			lacing_vals=null;
 			granule_vals=null;
-			//memset(os,0,sizeof(ogg_stream_state));    
+			//memset(os,0,sizeof(ogg_stream_state));
 		}
 		void destroy()
 		{
@@ -105,8 +104,7 @@ namespace OggSharp
 		}
 		void body_expand(int needed)
 		{
-			if(body_storage<=body_fill+needed)
-			{
+			if(body_storage<=body_fill+needed) {
 				body_storage+=(needed+1024);
 				byte[] foo=new byte[body_storage];
 				Array.Copy(body_data, 0, foo, 0, body_data.Length);
@@ -115,8 +113,7 @@ namespace OggSharp
 		}
 		void lacing_expand(int needed)
 		{
-			if(lacing_storage<=lacing_fill+needed)
-			{
+			if(lacing_storage<=lacing_fill+needed) {
 				lacing_storage+=(needed+32);
 				int[] foo=new int[lacing_storage];
 				Array.Copy(lacing_vals, 0, foo, 0, lacing_vals.Length);
@@ -133,15 +130,13 @@ namespace OggSharp
 		{
 			int lacing_val=op.bytes/255+1;
 
-			if(body_returned!=0)
-			{
+			if(body_returned!=0) {
 				/* advance packet data according to the body_returned pointer. We
 					   had to keep it around to return a pointer into the buffer last
 					   call */
-    
+
 				body_fill-=body_returned;
-				if(body_fill!=0)
-				{
+				if(body_fill!=0) {
 					Array.Copy(body_data, body_returned, body_data, 0, body_fill);
 				}
 				body_returned=0;
@@ -162,8 +157,7 @@ namespace OggSharp
 
 			/* Store lacing vals for this packet */
 			int j;
-			for(j=0;j<lacing_val-1;j++)
-			{
+			for(j=0; j<lacing_val-1; j++) {
 				lacing_vals[lacing_fill+j]=255;
 				granule_vals[lacing_fill+j]=granulepos;
 			}
@@ -178,7 +172,7 @@ namespace OggSharp
 			/* for the sake of completeness */
 			packetno++;
 
-			if(op.e_o_s!=0)e_o_s=1;
+			if(op.e_o_s!=0) { e_o_s=1; }
 			return(0);
 		}
 
@@ -191,13 +185,11 @@ namespace OggSharp
 
 			int ptr=lacing_returned;
 
-			if(lacing_packet<=ptr)
-			{
+			if(lacing_packet<=ptr) {
 				return(0);
 			}
 
-			if((lacing_vals[ptr]&0x400)!=0)
-			{
+			if((lacing_vals[ptr]&0x400)!=0) {
 				/* We lost sync here; let the app know */
 				lacing_returned++;
 
@@ -208,34 +200,33 @@ namespace OggSharp
 			}
 
 			/* Gather the whole packet. We'll have no holes or a partial packet */
-		{
-			int size=lacing_vals[ptr]&0xff;
-			int bytes=0;
-
-			op.packet_base=body_data;
-			op.packet=body_returned;
-			op.e_o_s=lacing_vals[ptr]&0x200; /* last packet of the stream? */
-			op.b_o_s=lacing_vals[ptr]&0x100; /* first packet of the stream? */
-			bytes+=size;
-
-			while(size==255)
 			{
-				int val=lacing_vals[++ptr];
-				size=val&0xff;
-				if((val&0x200)!=0)op.e_o_s=0x200;
+				int size=lacing_vals[ptr]&0xff;
+				int bytes=0;
+
+				op.packet_base=body_data;
+				op.packet=body_returned;
+				op.e_o_s=lacing_vals[ptr]&0x200; /* last packet of the stream? */
+				op.b_o_s=lacing_vals[ptr]&0x100; /* first packet of the stream? */
 				bytes+=size;
+
+				while(size==255) {
+					int val=lacing_vals[++ptr];
+					size=val&0xff;
+					if((val&0x200)!=0) { op.e_o_s=0x200; }
+					bytes+=size;
+				}
+
+				op.packetno=packetno;
+				op.granulepos=granule_vals[ptr];
+				op.bytes=bytes;
+
+				//System.out.println(this+" # body_returned="+body_returned);
+				body_returned+=bytes;
+				//System.out.println(this+"## body_returned="+body_returned);
+
+				lacing_returned=ptr+1;
 			}
-
-			op.packetno=packetno;
-			op.granulepos=granule_vals[ptr];
-			op.bytes=bytes;
-
-			//System.out.println(this+" # body_returned="+body_returned);
-			body_returned+=bytes;
-			//System.out.println(this+"## body_returned="+body_returned);
-
-			lacing_returned=ptr+1;
-		}
 			packetno++;
 			return(1);
 		}
@@ -263,78 +254,68 @@ namespace OggSharp
 			int segments=header_base[header+26]&0xff;
 
 			// clean up 'returned data'
-		{
-			int lr=lacing_returned;
-			int br=body_returned;
-
-			// body data
-
-			//System.out.println("br="+br+", body_fill="+body_fill);
-
-			if(br!=0)
 			{
-				body_fill-=br;
-				if(body_fill!=0)
-				{
-					Array.Copy(body_data, br, body_data, 0, body_fill);
-				}
-				body_returned=0;
-			}
+				int lr=lacing_returned;
+				int br=body_returned;
 
-			//System.out.println("?? br="+br+", body_fill="+body_fill+" body_returned="+body_returned);
+				// body data
 
-			if(lr!=0)
-			{
-				// segment table
-				if((lacing_fill-lr)!=0)
-				{
-					Array.Copy(lacing_vals, lr, lacing_vals, 0, lacing_fill-lr);
-					Array.Copy(granule_vals, lr, granule_vals, 0, lacing_fill-lr);
+				//System.out.println("br="+br+", body_fill="+body_fill);
+
+				if(br!=0) {
+					body_fill-=br;
+					if(body_fill!=0) {
+						Array.Copy(body_data, br, body_data, 0, body_fill);
+					}
+					body_returned=0;
 				}
-				lacing_fill-=lr;
-				lacing_packet-=lr;
-				lacing_returned=0;
+
+				//System.out.println("?? br="+br+", body_fill="+body_fill+" body_returned="+body_returned);
+
+				if(lr!=0) {
+					// segment table
+					if((lacing_fill-lr)!=0) {
+						Array.Copy(lacing_vals, lr, lacing_vals, 0, lacing_fill-lr);
+						Array.Copy(granule_vals, lr, granule_vals, 0, lacing_fill-lr);
+					}
+					lacing_fill-=lr;
+					lacing_packet-=lr;
+					lacing_returned=0;
+				}
 			}
-		}
 
 			// check the serial number
-			if(_serialno!=serialno)return(-1);
-			if(version>0)return(-1);
+			if(_serialno!=serialno) { return(-1); }
+			if(version>0) { return(-1); }
 
 			lacing_expand(segments+1);
 
 			// are we in sequence?
-			if(_pageno!=pageno)
-			{
+			if(_pageno!=pageno) {
 				int i;
 
 				// unroll previous partial packet (if any)
-				for(i=lacing_packet;i<lacing_fill;i++)
-				{
+				for(i=lacing_packet; i<lacing_fill; i++) {
 					body_fill-=lacing_vals[i]&0xff;
 					//System.out.println("??");
 				}
 				lacing_fill=lacing_packet;
 
 				// make a note of dropped data in segment table
-				if(pageno!=-1)
-				{
+				if(pageno!=-1) {
 					lacing_vals[lacing_fill++]=0x400;
 					lacing_packet++;
 				}
 
 				// are we a 'continued packet' page?  If so, we'll need to skip
 				// some segments
-				if(continued!=0)
-				{
+				if(continued!=0) {
 					bos=0;
-					for(;segptr<segments;segptr++)
-					{
+					for(; segptr<segments; segptr++) {
 						int val=(header_base[header+27+segptr]&0xff);
 						body+=val;
 						bodysize-=val;
-						if(val<255)
-						{
+						if(val<255) {
 							segptr++;
 							break;
 						}
@@ -344,8 +325,7 @@ namespace OggSharp
 
 			//System.out.println("bodysize="+bodysize);
 
-			if(bodysize!=0)
-			{
+			if(bodysize!=0) {
 				body_expand(bodysize);
 				Array.Copy(body_base, body, body_data, body_fill, bodysize);
 				body_fill+=bodysize;
@@ -353,40 +333,37 @@ namespace OggSharp
 
 			//System.out.println("bodyfill="+body_fill);
 
-		{
-			int saved=-1;
-			while(segptr<segments)
 			{
-				int val=(header_base[header+27+segptr]&0xff);
-				lacing_vals[lacing_fill]=val;
-				granule_vals[lacing_fill]=-1;
-      
-				if(bos!=0)
-				{
-					lacing_vals[lacing_fill]|=0x100;
-					bos=0;
-				}
-      
-				if(val<255)saved=lacing_fill;
-      
-				lacing_fill++;
-				segptr++;
-      
-				if(val<255)lacing_packet=lacing_fill;
-			}
-  
-			/* set the granulepos on the last pcmval of the last full packet */
-			if(saved!=-1)
-			{
-				granule_vals[saved]=granulepos;
-			}
-		}
+				int saved=-1;
+				while(segptr<segments) {
+					int val=(header_base[header+27+segptr]&0xff);
+					lacing_vals[lacing_fill]=val;
+					granule_vals[lacing_fill]=-1;
 
-			if(eos!=0)
-			{
+					if(bos!=0) {
+						lacing_vals[lacing_fill]|=0x100;
+						bos=0;
+					}
+
+					if(val<255) { saved=lacing_fill; }
+
+					lacing_fill++;
+					segptr++;
+
+					if(val<255) { lacing_packet=lacing_fill; }
+				}
+
+				/* set the granulepos on the last pcmval of the last full packet */
+				if(saved!=-1) {
+					granule_vals[saved]=granulepos;
+				}
+			}
+
+			if(eos!=0) {
 				e_o_s=1;
-				if(lacing_fill>0)
+				if(lacing_fill>0) {
 					lacing_vals[lacing_fill-1]|=0x200;
+				}
 			}
 
 			pageno=_pageno+1;
@@ -420,30 +397,26 @@ namespace OggSharp
 			int acc=0;
 			long granule_pos=granule_vals[0];
 
-			if(maxvals==0)return(0);
-  
+			if(maxvals==0) { return(0); }
+
 			/* construct a page */
 			/* decide how many segments to include */
-  
+
 			/* If this is the initial header case, the first page must only include
 				   the initial header packet */
-			if(b_o_s==0)
-			{  /* 'initial header page' case */
+			if(b_o_s==0) {
+				/* 'initial header page' case */
 				granule_pos=0;
-				for(vals=0;vals<maxvals;vals++)
-				{
-					if((lacing_vals[vals]&0x0ff)<255)
-					{
+				for(vals=0; vals<maxvals; vals++) {
+					if((lacing_vals[vals]&0x0ff)<255) {
 						vals++;
 						break;
 					}
 				}
 			}
-			else
-			{
-				for(vals=0;vals<maxvals;vals++)
-				{
-					if(acc>4096)break;
+			else {
+				for(vals=0; vals<maxvals; vals++) {
+					if(acc>4096) { break; }
 					acc+=(lacing_vals[vals]&0x0ff);
 					granule_pos=granule_vals[vals];
 				}
@@ -451,70 +424,66 @@ namespace OggSharp
 
 			/* construct the header in temp storage */
 
-		    String oggs_str = "OggS";
+			String oggs_str = "OggS";
 			Encoding AE = Encoding.UTF8;
 			byte[] oggs_byt = AE.GetBytes(oggs_str);
 			Array.Copy(oggs_byt, 0, header, 0, oggs_byt.Length);
-  
+
 			/* stream structure version */
 			header[4]=0x00;
 
 			/* continued packet flag? */
 			header[5]=0x00;
-			if((lacing_vals[0]&0x100)==0)header[5]|=0x01;
+			if((lacing_vals[0]&0x100)==0) { header[5]|=0x01; }
 			/* first page flag? */
-			if(b_o_s==0) header[5]|=0x02;
+			if(b_o_s==0) { header[5]|=0x02; }
 			/* last page flag? */
-			if(e_o_s!=0 && lacing_fill==vals) header[5]|=0x04;
+			if(e_o_s!=0 && lacing_fill==vals) { header[5]|=0x04; }
 			b_o_s=1;
 
 			/* 64 bits of PCM position */
-			for(i=6;i<14;i++)
-			{
+			for(i=6; i<14; i++) {
 				header[i]=(byte)granule_pos;
 				granule_pos>>=8;
 			}
 
 			/* 32 bits of stream serial number */
-		{
-			int _serialno=serialno;
-			for(i=14;i<18;i++)
 			{
-				header[i]=(byte)_serialno;
-				_serialno>>=8;
+				int _serialno=serialno;
+				for(i=14; i<18; i++) {
+					header[i]=(byte)_serialno;
+					_serialno>>=8;
+				}
 			}
-		}
 
 			/* 32 bits of page counter (we have both counter and page header
 				   because this val can roll over) */
-			if(pageno==-1)pageno=0;       /* because someone called
+			if(pageno==-1) { pageno=0; }       /* because someone called
 				     stream_reset; this would be a
 				     strange thing to do in an
 				     encode stream, but it has
 				     plausible uses */
-		{
-			int _pageno=pageno++;
-			for(i=18;i<22;i++)
 			{
-				header[i]=(byte)_pageno;
-				_pageno>>=8;
+				int _pageno=pageno++;
+				for(i=18; i<22; i++) {
+					header[i]=(byte)_pageno;
+					_pageno>>=8;
+				}
 			}
-		}
-  
+
 			/* zero for computation; filled in later */
 			header[22]=0;
 			header[23]=0;
 			header[24]=0;
 			header[25]=0;
-  
+
 			/* segment table */
 			header[26]=(byte)vals;
-			for(i=0;i<vals;i++)
-			{
+			for(i=0; i<vals; i++) {
 				header[i+27]=(byte)lacing_vals[i];
 				bytes+=(header[i+27]&0xff);
 			}
-  
+
 			/* set pointers in the ogg_page struct */
 			og.header_base=header;
 			og.header=0;
@@ -524,14 +493,14 @@ namespace OggSharp
 			og.body_len=bytes;
 
 			/* advance the lacing data and set the body_returned pointer */
-  
+
 			lacing_fill-=vals;
 			Array.Copy(lacing_vals, vals, lacing_vals, 0, lacing_fill*4);
 			Array.Copy(granule_vals, vals, granule_vals, 0, lacing_fill*8);
 			body_returned+=bytes;
-  
+
 			/* calculate the checksum */
-  
+
 			og.checksum();
 
 			/* done */
@@ -545,10 +514,10 @@ namespace OggSharp
 		public int pageout(Page og)
 		{
 			if((e_o_s!=0&&lacing_fill!=0) ||  /* 'were done, now flush' case */
-				body_fill-body_returned> 4096 ||     /* 'page nominal size' case */
-				lacing_fill>=255 ||          /* 'segment table full' case */
-				(lacing_fill!=0&&b_o_s==0))
-			{  /* 'initial header page' case */
+			        body_fill-body_returned> 4096 ||     /* 'page nominal size' case */
+			        lacing_fill>=255 ||          /* 'segment table full' case */
+			        (lacing_fill!=0&&b_o_s==0)) {
+				/* 'initial header page' case */
 				return flush(og);
 			}
 			return 0;
