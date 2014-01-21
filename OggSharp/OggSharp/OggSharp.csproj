@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F8C66EB3-E81D-45FB-B28E-747BE332230F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>OggSharp</RootNamespace>
+    <AssemblyName>OggSharp</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="CsVorbis\AllocChain.cs" />
+    <Compile Include="CsVorbis\Block.cs" />
+    <Compile Include="CsVorbis\Buffer.cs" />
+    <Compile Include="CsVorbis\CodeBook.cs" />
+    <Compile Include="CsVorbis\Comment.cs" />
+    <Compile Include="CsVorbis\Drft.cs" />
+    <Compile Include="CsVorbis\DspState.cs" />
+    <Compile Include="CsVorbis\EncodeAuxNearestMatch.cs" />
+    <Compile Include="CsVorbis\EncodeAuxThreshMatch.cs" />
+    <Compile Include="CsVorbis\Floor0.cs" />
+    <Compile Include="CsVorbis\Floor1.cs" />
+    <Compile Include="CsVorbis\FuncFloor.cs" />
+    <Compile Include="CsVorbis\FuncMapping.cs" />
+    <Compile Include="CsVorbis\FuncResidue.cs" />
+    <Compile Include="CsVorbis\FuncTime.cs" />
+    <Compile Include="CsVorbis\Info.cs" />
+    <Compile Include="CsVorbis\InfoMode.cs" />
+    <Compile Include="CsVorbis\Lookup.cs" />
+    <Compile Include="CsVorbis\Lpc.cs" />
+    <Compile Include="CsVorbis\Lsp.cs" />
+    <Compile Include="CsVorbis\Mapping0.cs" />
+    <Compile Include="CsVorbis\Mdct.cs" />
+    <Compile Include="CsVorbis\OggDecoder.cs" />
+    <Compile Include="CsVorbis\Packet.cs" />
+    <Compile Include="CsVorbis\Page.cs" />
+    <Compile Include="CsVorbis\PsyInfo.cs" />
+    <Compile Include="CsVorbis\PsyLook.cs" />
+    <Compile Include="CsVorbis\Residue0.cs" />
+    <Compile Include="CsVorbis\Residue1.cs" />
+    <Compile Include="CsVorbis\Residue2.cs" />
+    <Compile Include="CsVorbis\StaticCodeBook.cs" />
+    <Compile Include="CsVorbis\StreamState.cs" />
+    <Compile Include="CsVorbis\SyncState.cs" />
+    <Compile Include="CsVorbis\Time0.cs" />
+    <Compile Include="CsVorbis\VorbisFile.cs" />
+    <Compile Include="CsVorbis\csorbisException.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
