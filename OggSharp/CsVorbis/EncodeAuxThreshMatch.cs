@@ -27,11 +27,11 @@ using System;
 
 namespace OggSharp
 {
-	class EncodeAuxThreshMatch
-	{
-		internal float[] quantthresh;
-		internal int[]   quantmap;
-		internal int     quantvals;
-		internal int     threshvals;
-	}
+    class EncodeAuxThreshMatch
+    {
+        internal float[] quantthresh;
+        internal int[]   quantmap;
+        internal int     quantvals;
+        internal int     threshvals;
+    }
 }

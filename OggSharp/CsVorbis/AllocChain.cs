@@ -28,9 +28,9 @@ using System;
 
 namespace XnaGameLibrary.ThirdParty.OggSharp
 {
-	class AllocChain
-	{
-		//Object ptr;
-		//AllocChain next;
-	};
+    class AllocChain
+    {
+        //Object ptr;
+        //AllocChain next;
+    };
 }

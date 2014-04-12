@@ -28,11 +28,11 @@ using System;
 
 namespace OggSharp
 {
-	class InfoMode
-	{
-		internal int blockflag;
-		internal int windowtype;
-		internal int transformtype;
-		internal int mapping;
-	}
+    class InfoMode
+    {
+        internal int blockflag;
+        internal int windowtype;
+        internal int transformtype;
+        internal int mapping;
+    }
 }
