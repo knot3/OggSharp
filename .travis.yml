@@ -14,7 +14,6 @@ script:
 - git config --global user.name "Knot3 Server"
 - git config --global user.email "uaeti@student.kit.edu"
 - git remote set-url origin https://github.com/${TRAVIS_REPO_SLUG}.git
-- git fetch --unshallow
 - git checkout -f ${TRAVIS_BRANCH}
 - git checkout -f HEAD
 - git submodule update --init --recursive
